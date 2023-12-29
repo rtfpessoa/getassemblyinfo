@@ -20,6 +20,7 @@ public static class AssemblyInfo
         }
         catch (Exception ex)
         {
+            Environment.ExitCode = 1;
             sb.AppendFormat("{0}{1}", ex, Environment.NewLine);
         }
         return sb.ToString();
@@ -83,12 +84,13 @@ public static class AssemblyInfo
                 }
                 catch
                 {
-                    //
+                    Environment.ExitCode = 1;
                 }
             }
         }
         catch (Exception ex)
         {
+            Environment.ExitCode = 1;
             sb.AppendFormat("{0}{1}", ex, Environment.NewLine);
         }
 

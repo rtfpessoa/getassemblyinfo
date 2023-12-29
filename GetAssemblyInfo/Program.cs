@@ -1,5 +1,5 @@
 ﻿using GetAssemblyInfo;
-
+using System.Text;
 class Program
 {
     public static void Main(string[] args)
@@ -19,13 +19,23 @@ class Program
             return;
         }
 
-        if (args.Length > 1 && args[1] == "--full")
+        var sb = new StringBuilder();
+        try
         {
-            Console.Write(AssemblyInfo.GetFullAssemblyInfoFromFilePath(filePath));
+            if (args.Length > 1 && args[1] == "--full")
+            {
+                sb.Append(AssemblyInfo.GetFullAssemblyInfoFromFilePath(filePath));
+            }
+            else
+            {
+                sb.Append(AssemblyInfo.GetCompactAssemblyInfoFromFilePath(filePath));
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Console.Write(AssemblyInfo.GetCompactAssemblyInfoFromFilePath(filePath));
+            Environment.ExitCode = 1;
+            sb.AppendFormat("{0}{1}", ex, Environment.NewLine);
         }
+        Console.Write(sb.ToString());
     }
 }
