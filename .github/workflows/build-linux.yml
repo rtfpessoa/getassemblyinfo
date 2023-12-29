@@ -1,0 +1,56 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Build Linux
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x64
+            platform: linux/amd64
+          - os: ubuntu-latest
+            arch: arm64
+            platform: linux/arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: dotnet:latest
+          platforms: ${{ matrix.platform }}
+          build-args: TARGETARCH=${{ matrix.arch }}
+
+      - name: Copy Binary from Container
+        run: |
+          echo "Starting Container"
+          docker run --name=download -d -it --entrypoint=sh dotnet:latest
+          echo "Copy file from container"
+          mkdir -p output
+          docker cp download:/app/GetAssemblyInfo ./output/GetAssemblyInfo
+          echo "Remove container"
+          docker rm -f download
+
+      - name: Upload Binary as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GetAssemblyInfo-${{ matrix.os }}-${{ matrix.arch }}
+          path: ${{ github.workspace }}/output/GetAssemblyInfo

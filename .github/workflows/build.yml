@@ -1,74 +1,51 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+name: Build Windows and MacOS
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-2022, macos-11]
-        include:
-          - os: ubuntu-22.04
-            arch: linux-x64
+        os: [windows-2022, macos-11]
+        arch: [x64, arm64]
+        exclude:
+          # Not supported yet by GitHub Actions
           - os: windows-2022
-            arch: win-x64
-          - os: macos-11
-            arch: osx-x64
+            arch: arm64
+          # - os: windows-2022
+          #   arch: x64
+          # - os: macos-11
+          #   arch: x64
+          # - os: macos-11
+          #   arch: arm64
     steps:
-    - name: Install dependencies 
-      if: matrix.arch == 'linux-x64'
-      run: |
-        sudo apt-get update
-        sudo apt install clang
-        sudo apt-get install libtool
-        sudo apt-get install libssl-dev
-        sudo apt-get install -y make gcc libc-dev libpq-dev zlib1g-dev
-        sudo -E apt-get install -y libpam-dev libedit-dev libselinux1-dev
-        sudo -E apt-get install -y libssl-dev libkrb5-dev
-      
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore --arch ${{ matrix.arch }}
+        working-directory: GetAssemblyInfo
 
-    - name: Build
-      run: dotnet build -c Release
+      - name: Publish
+        run: dotnet publish --no-restore --self-contained --arch ${{ matrix.arch }} -c Release -o ../output
+        working-directory: GetAssemblyInfo
 
-    - name: Publish
-      run: dotnet publish -c Release -o ../output
-      working-directory: GetAssemblyInfo
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: GetAssemblyInfo-${{ matrix.arch }}
-        path: |
-          ${{ github.workspace }}/output/GetAssemblyInfo
-          ${{ github.workspace }}/output/GetAssemblyInfo.exe
-
-    - name: Publish shared library
-      if: matrix.arch != 'osx-x64'
-      run: dotnet publish /p:NativeLib=Shared /p:OutputType=Library -r ${{ matrix.arch }} -c Release -o ../output
-      working-directory: GetAssemblyInfo
-
-    - uses: actions/upload-artifact@v3
-      if: matrix.arch != 'osx-x64'
-      with:
-        name: GetAssemblyInfo-${{ matrix.arch }}-shared
-        path: |
-          ${{ github.workspace }}/output/GetAssemblyInfo.dll
-          ${{ github.workspace }}/output/GetAssemblyInfo.so
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GetAssemblyInfo-${{ matrix.os }}-${{ matrix.arch }}
+          path: |
+            ${{ github.workspace }}/output/GetAssemblyInfo
+            ${{ github.workspace }}/output/GetAssemblyInfo.exe

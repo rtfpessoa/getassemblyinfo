@@ -11,7 +11,7 @@
         <PublishTrimmed>true</PublishTrimmed>
         <UseSystemResourceKeys>true</UseSystemResourceKeys>
     </PropertyGroup>
-    
+
     <Choose>
         <When Condition="$([MSBuild]::IsOSPlatform('OSX'))">
             <PropertyGroup>
@@ -23,14 +23,18 @@
                 <PublishAot>true</PublishAot>
                 <ExportsFile>$(MSBuildThisFileDirectory)exports.def</ExportsFile>
             </PropertyGroup>
-            <ItemGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64' AND '$(OutputType)' == 'Exe'">
+            <ItemGroup
+                Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64' AND '$(OutputType)' == 'Exe'">
                 <PackageReference Include="PublishAotCompressed" Version="1.0.0" />
             </ItemGroup>
         </Otherwise>
     </Choose>
 
     <ItemGroup>
-      <PackageReference Include="Mono.Cecil" Version="0.11.4" />
+        <PackageReference Include="Mono.Cecil" Version="0.11.4" />
+        <PackageReference
+            Include="Microsoft.DotNet.ILCompiler; runtime.linux-arm64.Microsoft.DotNet.ILCompiler"
+            Version="8.0.0" />
     </ItemGroup>
 
 </Project>
