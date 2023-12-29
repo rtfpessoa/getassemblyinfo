@@ -1,11 +1,10 @@
 # Usage
-# docker buildx build -f Dockerfile --platform linux/amd64 --build-arg="TARGETARCH=x64" -t dotnetnonroot.azurecr.io/dotnetapp-x64 .
-# docker buildx build -f Dockerfile --platform linux/arm64 --build-arg="TARGETARCH=arm64" -t dotnetnonroot.azurecr.io/dotnetapp-arm64 .
+# docker buildx build -f Dockerfile --platform linux/amd64 --build-arg="TARGETARCH=x64" -t dotnet/GetAssemblyInfo-x64:latest .
+# docker buildx build -f Dockerfile --platform linux/arm64 --build-arg="TARGETARCH=arm64" -t dotnet/GetAssemblyInfo-arm64:latest .
 
 # To learn about building .NET container images:
 # https://github.com/dotnet/dotnet-docker/blob/main/samples/README.md
-# FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-FROM mcr.microsoft.com/dotnet/nightly/sdk:9.0-preview AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG TARGETARCH
 WORKDIR /source
 
@@ -20,11 +19,3 @@ RUN dotnet restore --arch $TARGETARCH
 # copy and publish app and libraries
 COPY GetAssemblyInfo/* .
 RUN dotnet publish --no-restore --self-contained  -c Release -o /app --arch $TARGETARCH
-
-# To enable globalization:
-# https://github.com/dotnet/dotnet-docker/blob/main/samples/enable-globalization.md
-# final stage/image
-FROM mcr.microsoft.com/dotnet/runtime:8.0-jammy
-WORKDIR /app
-COPY --from=build /app .
-ENTRYPOINT ["./GetAssemblyInfo"]
