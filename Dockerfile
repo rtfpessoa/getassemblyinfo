@@ -4,7 +4,7 @@
 
 # To learn about building .NET container images:
 # https://github.com/dotnet/dotnet-docker/blob/main/samples/README.md
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG TARGETARCH
 WORKDIR /source
 
