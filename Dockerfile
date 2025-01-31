@@ -18,4 +18,4 @@ RUN dotnet restore --arch $TARGETARCH
 
 # copy and publish app and libraries
 COPY GetAssemblyInfo/* .
-RUN dotnet publish --no-restore --self-contained  -c Release -o /app --arch $TARGETARCH
+RUN dotnet publish --no-restore --self-contained  -c Release -o /app --runtime linux-$TARGETARCH
