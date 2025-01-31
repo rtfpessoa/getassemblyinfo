@@ -12,6 +12,7 @@
         <UseSystemResourceKeys>true</UseSystemResourceKeys>
     </PropertyGroup>
 
+    <!--
     <Choose>
         <When Condition="$([MSBuild]::IsOSPlatform('OSX'))">
             <PropertyGroup>
@@ -29,6 +30,11 @@
             </ItemGroup>
         </Otherwise>
     </Choose>
+    -->
+
+    <PropertyGroup>
+        <PublishSingleFile>true</PublishSingleFile>
+    </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Mono.Cecil" Version="0.11.6" />
