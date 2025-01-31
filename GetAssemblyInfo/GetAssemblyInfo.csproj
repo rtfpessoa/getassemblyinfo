@@ -7,7 +7,7 @@
         <Nullable>enable</Nullable>
         <SelfContained>true</SelfContained>
         <PublishReadyToRun>true</PublishReadyToRun>
-        <StripSymbols>true</StripSymbols>
+        <StripSymbols>false</StripSymbols>
         <PublishTrimmed>true</PublishTrimmed>
         <UseSystemResourceKeys>true</UseSystemResourceKeys>
     </PropertyGroup>
@@ -23,15 +23,17 @@
                 <PublishAot>true</PublishAot>
                 <ExportsFile>$(MSBuildThisFileDirectory)exports.def</ExportsFile>
             </PropertyGroup>
+            <!--
             <ItemGroup
-                Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64' AND '$(OutputType)' == 'Exe'">
-                <PackageReference Include="PublishAotCompressed" Version="1.0.0" />
+                Condition="('$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64' OR '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'ARM64') AND '$(OutputType)' == 'Exe'">
+                <PackageReference Include="PublishAotCompressed" Version="1.0.3" />
             </ItemGroup>
+            -->
         </Otherwise>
     </Choose>
 
     <ItemGroup>
-        <PackageReference Include="Mono.Cecil" Version="0.11.4" />
+        <PackageReference Include="Mono.Cecil" Version="0.11.6" />
     </ItemGroup>
 
 </Project>

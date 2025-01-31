@@ -12,10 +12,12 @@ RUN apt -y update && \
   apt-get -y install build-essential clang && \
   apt-get install -y libc6 libgcc1 libgcc-s1 libgssapi-krb5-2 liblttng-ust1 libssl3 libstdc++6 libunwind8 zlib1g zlib1g-dev
 
+ENV DOTNET_EnableWriteXorExecute=0
+
 # copy csproj and restore as distinct layers
 COPY GetAssemblyInfo/*.csproj .
 RUN dotnet restore --arch $TARGETARCH
 
 # copy and publish app and libraries
 COPY GetAssemblyInfo/* .
-RUN dotnet publish --no-restore --self-contained  -c Release -o /app --arch $TARGETARCH
+RUN dotnet publish --no-restore --self-contained  -c Release -o /app --runtime linux-$TARGETARCH
